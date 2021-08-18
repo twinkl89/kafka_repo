@@ -1,0 +1,171 @@
+---
+all:
+  vars:
+    ansible_connection: ssh
+    ansible_user: venkat
+    ansible_ssh_private_key_file: /tmp/certs/ssh_priv.pem
+    jmxexporter_enabled: true
+    ssl_enabled: true
+    sasl_protocol: plain
+    sasl_plain_users:
+      venkat:
+        principal: venkat
+        password: password
+      suhas:
+        principal: suhas
+        password: password
+      abhishek:
+        principal: abhishek
+        password: password
+      aditi:
+        principal: aditi
+        password: password
+      apeksha:
+        principal: apeksha
+        password: password
+      shilpa:
+        principal: shilpa
+        password: password
+    kafka_broker_custom_listeners:
+      client_listener:
+        name: CLIENT
+        port: 9093
+        ssl_enabled: true
+        ssl_mutual_auth_enabled: false
+        sasl_protocol: plain
+
+zookeeper:
+  vars:
+    zookeeper_custom_properties:
+      initLimit: 6
+      syncLimit: 3
+      tickTime: 2000
+      dataDir: /var/lib/zookeeper/
+      clientPort: 2181
+      autopurge.snapRetainCount: 3
+      autopurge.purgeInterval: 24
+  hosts:
+    ip-10-100-253-170.ec2.internal:
+      ansible_host: 10.100.253.170
+      zookeeper.id: 1
+      ansible_password: "fEzKKHQ4jS35?AE5"
+      ansible_become_password: "fEzKKHQ4jS35?AE5"
+    ip-10-100-252-195.ec2.internal:
+      ansible_host: 10.100.252.195
+      zookeeper.id: 2
+      ansible_password: "&74fTd5fjmSW4BPB"
+      ansible_become_password: "&74fTd5fjmSW4BPB"
+    ip-10-100-253-217.ec2.internal:
+      ansible_host: 10.100.253.217
+      zookeeper.id: 3
+      ansible_password: "RLZ2#NzdW45fEmEL"
+      ansible_become_password: "RLZ2#NzdW45fEmEL"
+
+kafka_broker:
+  hosts:
+    ip-10-100-253-170.ec2.internal:
+      kafka_broker_custom_listeners:
+        client_listener:
+          hostname: 10.100.253.170
+      ansible_host: 10.100.253.170
+      zookeeper.id: 1
+      ansible_password: "fEzKKHQ4jS35?AE5"
+      ansible_become_password: "fEzKKHQ4jS35?AE5"
+    ip-10-100-252-195.ec2.internal:
+      kafka_broker_custom_listeners:
+        client_listener:
+          hostname: 10.100.252.195
+      ansible_host: 10.100.252.195
+      zookeeper.id: 2
+      ansible_password: "&74fTd5fjmSW4BPB"
+      ansible_become_password: "&74fTd5fjmSW4BPB"
+    ip-10-100-253-217.ec2.internal:
+      kafka_broker_custom_listeners:
+        client_listener:
+          hostname: 10.100.253.217
+      ansible_host: 10.100.253.217
+      zookeeper.id: 3
+      ansible_password: "RLZ2#NzdW45fEmEL"
+      ansible_become_password: "RLZ2#NzdW45fEmEL"
+schema_registry:
+  hosts:
+    ip-10-100-252-38.ec2.internal:
+      ansible_host: 10.100.252.38
+      zookeeper.id: 3
+      ansible_password: "A*HZsja4#eZmBj+z"
+      ansible_become_password: "A*HZsja4#eZmBj+z"
+
+kafka_rest:
+  hosts:
+    ip-10-100-252-38.ec2.internal:
+      ansible_host: 10.100.252.38
+      zookeeper.id: 3
+      ansible_password: "A*HZsja4#eZmBj+z"
+      ansible_become_password: "A*HZsja4#eZmBj+z"
+ksql:
+  hosts:
+    ip-10-100-252-38.ec2.internal:
+      ansible_host: 10.100.252.38
+      zookeeper.id: 3
+      ansible_password: "A*HZsja4#eZmBj+z"
+      ansible_become_password: "A*HZsja4#eZmBj+z"
+
+
+kafka_connect:
+  ## To set variables on all kafka_connect hosts, use the vars block here
+  vars:
+    kafka_connect_monitoring_interceptors_enabled: true
+  #   ## To configure Connect to run as a custom user, uncomment below
+  #   kafka_connect_user: custom-user
+  #   kafka_connect_group: custom-group
+
+  #   ## To copy files to kafka_connect hosts, set this list below
+  #   kafka_connect_copy_files:
+  #     - source_path: /path/to/file.txt
+  #       destination_path: /tmp/file.txt
+  #
+  #   ### Connectors and the Confluent Hub
+  #   # Adding Connector Paths.
+  #   # NOTE: This variable is mapped to the `plugin.path` Kafka Connect property.
+    kafka_connect_plugins_path:
+      - /usr/share/java
+      - /my/connectors/dir
+  #
+  #   ## Installing Connectors From Confluent Hub
+    kafka_connect_confluent_hub_plugins:
+      - jcustenborder/kafka-connect-spooldir:2.0.43
+      - confluentinc/kafka-connect-datagen:0.5.0
+  #
+  #   ## Installing Connectors from Archive files local to Ansible host
+  #   kafka_connect_plugins:
+  #   - local/path/to/connect_archive.zip
+  #
+  #   ## Installing Connectors from Archive files in remote server (ie Nexus)
+  #   kafka_connect_plugins_remote:
+  #   - http://myhost.com/connect_archive.zip
+  #
+  #   ### RBAC with Connect Secret Registry
+  #   # By default the secret registry will be enabled when RBAC is on. To customize the key set this var:
+  #   kafka_connect_secret_registry_key: <your own key>
+  #   # To disable the feature:
+  #   kafka_connect_secret_registry_enabled: false
+  hosts:
+    ip-10-100-252-38.ec2.internal:
+      ansible_host: 10.100.252.38
+      zookeeper.id: 3
+      ansible_password: "A*HZsja4#eZmBj+z"
+      ansible_become_password: "A*HZsja4#eZmBj+z"
+
+control_center:
+  vars:
+    control_center_properties:
+      metric.reporters=io.confluent.metrics.reporter.ConfluentMetricsReporter
+    control_center_service_environment_overrides:
+      CONTROL_CENTER_HEAP_OPTS: "-Xmx8g"
+  hosts:
+    ip-10-100-252-38.ec2.internal:
+      ansible_host: 10.100.252.38
+      zookeeper.id: 3
+      ansible_password: "A*HZsja4#eZmBj+z"
+      ansible_become_password: "A*HZsja4#eZmBj+z"
+
